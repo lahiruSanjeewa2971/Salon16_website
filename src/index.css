@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Salon16 Brand Colors */
+    --background: 0 0% 100%;
+    --foreground: 328 100% 16%;
+    
+    /* Primary - Deep Plum */
+    --primary: 328 44% 29%;
+    --primary-foreground: 0 0% 100%;
+    --primary-dark: 332 40% 39%;
+    --primary-light: 330 81% 60%;
+    
+    /* Secondary - Peach & Beige */
+    --secondary: 15 71% 92%;
+    --secondary-foreground: 328 44% 29%;
+    --warm-beige: 25 65% 87%;
+    
+    /* Accent - Gold */
+    --accent: 45 65% 53%;
+    --accent-foreground: 328 44% 29%;
+    --light-gold: 48 89% 60%;
+    
+    /* Card */
+    --card: 0 0% 100%;
+    --card-foreground: 328 100% 16%;
+    
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 328 100% 16%;
+    
+    /* Muted */
+    --muted: 15 71% 92%;
+    --muted-foreground: 328 20% 40%;
+    
+    /* Destructive */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    /* Border & Input */
+    --border: 328 20% 85%;
+    --input: 328 20% 85%;
+    --ring: 328 44% 29%;
+    
+    --radius: 1rem;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(328, 44%, 29%), hsl(332, 40%, 39%), hsl(330, 81%, 60%));
+    --gradient-gold: linear-gradient(135deg, hsl(45, 65%, 53%), hsl(48, 89%, 60%));
+    --gradient-luxury: linear-gradient(135deg, hsl(328, 44%, 29%) 0%, hsl(332, 40%, 39%) 50%, hsl(45, 65%, 53%) 100%);
+    
+    /* Shadows */
+    --shadow-elegant: 0 10px 40px -10px hsl(328, 44%, 29%, 0.3);
+    --shadow-glow: 0 0 30px hsl(330, 81%, 60%, 0.4);
+    --shadow-gold: 0 0 25px hsl(45, 65%, 53%, 0.3);
+    
+    /* Transitions */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .dark {
+    --background: 328 44% 10%;
+    --foreground: 0 0% 100%;
+    --card: 328 44% 15%;
+    --card-foreground: 0 0% 100%;
+    --popover: 328 44% 15%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 330 81% 60%;
+    --primary-foreground: 328 44% 10%;
+    --secondary: 328 30% 20%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 328 30% 20%;
+    --muted-foreground: 328 20% 70%;
+    --accent: 45 65% 53%;
+    --accent-foreground: 328 44% 10%;
+    --border: 328 30% 25%;
+    --input: 328 30% 25%;
+    --ring: 330 81% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-gold {
+    background: var(--gradient-gold);
+  }
+  
+  .gradient-luxury {
+    background: var(--gradient-luxury);
+  }
+  
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+  
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+}
