@@ -1,6 +1,4 @@
 import { motion } from 'framer-motion';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import FeatureCard from '@/components/FeatureCard';
 import PhoneMockup from '@/components/PhoneMockup';
 import { features } from '@/data/mockData';
@@ -18,8 +16,6 @@ const Features = () => {
 
   return (
     <div className="min-h-screen">
-      <Navbar />
-      
       {/* Hero Section */}
       <section className="pt-20 lg:pt-32 pb-20 gradient-luxury text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -141,7 +137,6 @@ const Features = () => {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 };
