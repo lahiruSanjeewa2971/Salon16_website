@@ -32,6 +32,18 @@ const Navbar = () => {
     }
   }, [isMobile, isOpen]);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen && isMobile) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, isMobile]);
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Features', path: '/features' },
@@ -45,13 +57,13 @@ const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background w-full max-w-full ${
         isScrolled 
           ? 'backdrop-blur-lg shadow-elegant border-b border-border/50' 
           : 'backdrop-blur-md'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex items-center justify-between ${isMobile ? 'h-20 py-3' : 'h-24 py-4'}`}>
           {/* Left: Logo */}
           <Link to="/" className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
@@ -63,7 +75,7 @@ const Navbar = () => {
             />
             <motion.h1
               whileHover={{ scale: 1.05 }}
-              className="text-xl sm:text-2xl lg:text-3xl font-bold gradient-luxury bg-clip-text text-transparent"
+              className="text-xl sm:text-2xl lg:text-3xl font-bold bg-clip-text"
             >
               Salon16
             </motion.h1>
@@ -119,7 +131,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu (only show on mobile devices) */}
+      {/* Mobile Menu (only show on mobile/tablet devices) */}
       {isMobile && (
         <AnimatePresence>
           {isOpen && (
@@ -129,22 +141,27 @@ const Navbar = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
                 onClick={() => setIsOpen(false)}
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+                className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55] w-full h-full"
               />
               
               {/* Full Screen Menu */}
               <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="fixed inset-0 bg-background z-50 overflow-hidden flex flex-col"
+                initial={{ opacity: 0, x: '100%' }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: '100%' }}
+                transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
+                className="fixed inset-0 w-full h-full bg-background z-[60] flex flex-col overflow-hidden"
               >
-                {/* Close Button */}
-                <div className="flex justify-end p-4 pt-20">
+                {/* Header with Close Button */}
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border flex-shrink-0">
+                  <h2 className="text-xl font-bold text-foreground">
+                    Salon 16
+                  </h2>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-lg hover:bg-secondary transition-smooth"
+                    className="p-2 rounded-lg hover:bg-secondary transition-smooth text-foreground"
                     aria-label="Close menu"
                   >
                     <X size={24} />
@@ -152,27 +169,33 @@ const Navbar = () => {
                 </div>
                 
                 {/* Centered Navigation Links */}
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="w-full px-4 space-y-3">
-                    {navLinks.map((link) => (
-                      <Link
+                <div className="flex-1 flex items-center justify-center min-h-0 py-8">
+                  <div className="w-full max-w-md px-4 sm:px-6 space-y-3">
+                    {navLinks.map((link, index) => (
+                      <motion.div
                         key={link.path}
-                        to={link.path}
-                        onClick={() => setIsOpen(false)}
-                        className={`block py-4 px-4 rounded-lg transition-smooth font-medium text-lg text-center ${
-                          location.pathname === link.path
-                            ? 'bg-primary text-primary-foreground'
-                            : 'hover:bg-secondary text-foreground'
-                        }`}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05, duration: 0.3 }}
                       >
-                        {link.name}
-                      </Link>
+                        <Link
+                          to={link.path}
+                          onClick={() => setIsOpen(false)}
+                          className={`block py-4 px-6 rounded-lg transition-smooth font-medium text-lg text-center ${
+                            location.pathname === link.path
+                              ? 'bg-primary text-primary-foreground shadow-md'
+                              : 'hover:bg-secondary text-foreground'
+                          }`}
+                        >
+                          {link.name}
+                        </Link>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
                 
                 {/* Auth Buttons at Bottom */}
-                <div className="w-full px-4 pb-3 pt-4 border-t border-border">
+                <div className="w-full px-4 sm:px-6 pb-6 sm:pb-8 pt-6 border-t border-border bg-muted/30 flex-shrink-0">
                   <AuthButtons isMobile={true} />
                 </div>
               </motion.div>

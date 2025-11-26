@@ -43,7 +43,7 @@ const Contact = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="pt-20 lg:pt-32 pb-20 gradient-primary text-white">
+      <section className="pt-20 lg:pt-24 pb-20 gradient-primary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

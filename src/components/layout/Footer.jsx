@@ -19,13 +19,12 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="gradient-luxury text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
-          {/* Column 1: Brand Section */}
+    <footer className="gradient-luxury text-white w-full overflow-x-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 lg:gap-16 w-full">
           <div className="space-y-6">
             <div>
-              <h3 className="text-3xl font-bold gradient-gold bg-clip-text text-transparent mb-4">
+              <h3 className="text-3xl font-bold bg-clip-text text-light-gold mb-4">
                 Salon16
               </h3>
               <p className="text-white/90 text-base leading-relaxed max-w-sm">
@@ -48,7 +47,6 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Column 2: Quick Links */}
           <div>
             <h4 className="text-xl font-bold mb-6 text-light-gold">Quick Links</h4>
             <ul className="space-y-3">
@@ -68,7 +66,6 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 3: Contact Info */}
           <div>
             <h4 className="text-xl font-bold mb-6 text-light-gold">Contact Us</h4>
             <ul className="space-y-4">
