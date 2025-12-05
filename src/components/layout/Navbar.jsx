@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -131,8 +132,8 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu (only show on mobile/tablet devices) */}
-      {isMobile && (
+      {/* Mobile Menu (only show on mobile/tablet devices) - Rendered via Portal */}
+      {isMobile && typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {isOpen && (
             <>
@@ -143,7 +144,7 @@ const Navbar = () => {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 onClick={() => setIsOpen(false)}
-                className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55] w-full h-full"
+                className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55]"
               />
               
               {/* Full Screen Menu */}
@@ -152,7 +153,7 @@ const Navbar = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: '100%' }}
                 transition={{ type: 'tween', duration: 0.3, ease: 'easeInOut' }}
-                className="fixed inset-0 w-full h-full bg-background z-[60] flex flex-col overflow-hidden"
+                className="fixed inset-0 bg-background z-[60] flex flex-col overflow-y-auto"
               >
                 {/* Header with Close Button */}
                 <div className="flex items-center justify-between p-4 sm:p-6 border-b border-border flex-shrink-0">
@@ -201,7 +202,8 @@ const Navbar = () => {
               </motion.div>
             </>
           )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
       )}
     </motion.nav>
   );
