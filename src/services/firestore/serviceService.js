@@ -1,4 +1,4 @@
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection, getDocs, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../config/firebase'
 
 const SERVICE_COLLECTION = "services";

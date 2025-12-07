@@ -14,7 +14,7 @@ export const fetchServices = createAsyncThunk(
 )
 
 export const fetchActiveServices = createAsyncThunk(
-    'services/getchActiveServices',
+    'services/fetchActiveServices',
     async(_, {rejectWithValue}) => {
         try {
             const services = await serviceService.getActiveServices;
