@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Instagram, Facebook, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Instagram, Facebook, Twitter, Mail, Phone, MapPin, Clock } from 'lucide-react';
 
 const Footer = () => {
   const socialLinks = [
@@ -75,19 +75,8 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="text-white/60 text-sm mb-1">Phone</p>
-                  <a href="tel:+15551234567" className="text-white/90 hover:text-white transition-smooth text-base">
-                    +1 (555) 123-4567
-                  </a>
-                </div>
-              </li>
-              <li className="flex items-start space-x-4">
-                <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 flex-shrink-0">
-                  <Mail size={18} className="text-light-gold" />
-                </div>
-                <div>
-                  <p className="text-white/60 text-sm mb-1">Email</p>
-                  <a href="mailto:hello@salon16.com" className="text-white/90 hover:text-white transition-smooth text-base">
-                    hello@salon16.com
+                  <a href="tel:+94789109693" className="text-white/90 hover:text-white transition-smooth text-base">
+                    0789109693
                   </a>
                 </div>
               </li>
@@ -98,8 +87,20 @@ const Footer = () => {
                 <div>
                   <p className="text-white/60 text-sm mb-1">Address</p>
                   <p className="text-white/90 text-base leading-relaxed">
-                    123 Beauty Avenue,<br />
-                    New York, NY 10001
+                    Salon 16, Malpitiya,<br />
+                    Boyagane
+                  </p>
+                </div>
+              </li>
+              <li className="flex items-start space-x-4">
+                <div className="p-2 bg-white/10 rounded-lg backdrop-blur-sm border border-white/10 flex-shrink-0">
+                  <Clock size={18} className="text-light-gold" />
+                </div>
+                <div>
+                  <p className="text-white/60 text-sm mb-1">Working Hours</p>
+                  <p className="text-white/90 text-sm leading-relaxed">
+                    Mon, Wed-Sun: 8:30 AM - 8:00 PM<br />
+                    <span className="text-white/70">Tuesday: Closed</span>
                   </p>
                 </div>
               </li>
