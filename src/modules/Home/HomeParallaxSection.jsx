@@ -71,7 +71,7 @@ const HomeParallaxSection = () => {
     ];
 
   return (
-    <section className="relative w-full h-[66vh] min-h-[300px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] max-h-[800px] overflow-hidden">
+    <section className="relative w-full h-[78vh] min-h-[300px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] max-h-[800px] overflow-hidden my-8 sm:my-12 md:my-16">
       {/* Fixed Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
