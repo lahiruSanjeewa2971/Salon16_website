@@ -14,6 +14,7 @@ import Gallery from "./pages/Gallery";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import AuthInitializer from "@/components/AuthInitializer"
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+          <AuthInitializer/>
             <Routes>
               <Route element={<Layout />}>
                 <Route path="/" element={<Home />} />
