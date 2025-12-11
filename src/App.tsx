@@ -13,6 +13,8 @@ import Services from "./pages/Services";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import AuthInitializer from "@/components/AuthInitializer"
 
@@ -35,6 +37,8 @@ const App = () => (
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Route>

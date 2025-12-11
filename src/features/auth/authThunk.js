@@ -11,6 +11,8 @@ export const loginUser = createAsyncThunk(
             return {
                 id: user.uid,
                 email: user.email || '',
+                firstName: userData?.firstName || '',
+                lastName: userData?.lastName || '',
                 displayName: userData?.displayName || user.displayName || '',
                 photoURL: userData?.photoURL || user.photoURL || '',
                 role: userData?.role || 'user',
@@ -18,6 +20,29 @@ export const loginUser = createAsyncThunk(
             }
         } catch (error) {
             return rejectWithValue(error.message || 'Login failed');
+        }
+    }
+)
+
+export const registerUser = createAsyncThunk(
+    'auth/register',
+    async ({email, password, firstName, lastName}, {rejectWithValue}) => {
+        try {
+            const user = await authService.register(email, password, firstName, lastName);
+            const userData = await authService.getUserData(user.uid);
+
+            return {
+                id: user.uid,
+                email: user.email || '',
+                firstName: userData?.firstName || firstName || '',
+                lastName: userData?.lastName || lastName || '',
+                displayName: userData?.displayName || `${firstName || ''} ${lastName || ''}`.trim() || '',
+                photoURL: userData?.photoURL || user.photoURL || '',
+                role: userData?.role || 'user',
+                isAdmin: userData?.isAdmin || false,
+            }
+        } catch (error) {
+            return rejectWithValue(error.message || 'Registration failed');
         }
     }
 )
@@ -48,6 +73,8 @@ export const checkAuthState = createAsyncThunk(
             return {
                 id: user.uid,
                 email: user.email,
+                firstName: userData?.firstName || '',
+                lastName: userData?.lastName || '',
                 displayName: userData?.displayName || user.displayName || '',
                 photoURL: userData?.photoURL || user.photoURL || '',
             }
