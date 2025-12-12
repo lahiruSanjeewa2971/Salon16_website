@@ -8,13 +8,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Layout from "@/components/layout/Layout";
 import Home from "@/modules/Home";
-import Features from "./pages/Features";
 import Services from "./pages/Services";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Bookings from "./pages/Bookings";
+import Reviews from "./pages/Reviews";
 import NotFound from "./pages/NotFound";
 import AuthInitializer from "@/components/AuthInitializer"
 
@@ -32,11 +33,12 @@ const App = () => (
             <Routes>
               <Route element={<Layout />}>
                 <Route path="/" element={<Home />} />
-                <Route path="/features" element={<Features />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/bookings" element={<Bookings />} />
+                <Route path="/reviews" element={<Reviews />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

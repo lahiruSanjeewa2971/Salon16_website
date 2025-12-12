@@ -7,12 +7,14 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import ThemeToggle from '../ThemeToggle';
 import AuthButtons from '../AuthButtons';
 import logoIcon from '@/assets/icon-192x192.png';
+import { useAppSelector } from '@/store/hooks';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
+  const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,14 +47,20 @@ const Navbar = () => {
     };
   }, [isOpen, isMobile]);
 
-  const navLinks = [
+  const baseLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Features', path: '/features' },
     { name: 'Services', path: '/services' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' }
   ];
+
+  const authedLinks = [
+    { name: 'Bookings', path: '/bookings' },
+    { name: 'Reviews', path: '/reviews' },
+  ];
+
+  const navLinks = user ? [...baseLinks, ...authedLinks] : baseLinks;
 
   return (
     <motion.nav

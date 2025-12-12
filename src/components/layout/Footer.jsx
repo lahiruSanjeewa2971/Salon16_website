@@ -1,22 +1,31 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Instagram, Facebook, Twitter, Mail, Phone, MapPin, Clock } from 'lucide-react';
+import { useAppSelector } from '@/store/hooks';
 
 const Footer = () => {
+  const { user } = useAppSelector((state) => state.auth);
+
   const socialLinks = [
     { icon: Instagram, href: '#', label: 'Instagram' },
     { icon: Facebook, href: '#', label: 'Facebook' },
     { icon: Twitter, href: '#', label: 'Twitter' }
   ];
 
-  const quickLinks = [
+  const baseLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Features', path: '/features' },
     { name: 'Services', path: '/services' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'About', path: '/about' },
     { name: 'Contact', path: '/contact' }
   ];
+
+  const authedLinks = [
+    { name: 'Bookings', path: '/bookings' },
+    { name: 'Reviews', path: '/reviews' },
+  ];
+
+  const quickLinks = user ? [...baseLinks, ...authedLinks] : baseLinks;
 
   return (
     <footer className="gradient-luxury text-white w-full overflow-x-hidden">

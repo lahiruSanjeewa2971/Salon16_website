@@ -14,9 +14,6 @@ export const authService = {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Send email verification
-        await sendEmailVerification(user);
-
         // Create user document in Firestore with default values
         const userRef = doc(db, USER_COLLECTION, user.uid);
         const displayName = `${firstName || ''} ${lastName || ''}`.trim() || '';
@@ -45,6 +42,19 @@ export const authService = {
         await updateProfile(user, {
             displayName: displayName,
         });
+
+        // Send email verification (don't fail registration if email sending fails)
+        try {
+            await sendEmailVerification(user, {
+                url: window.location.origin, // Redirect URL after email verification
+                handleCodeInApp: false, // Use email link instead of in-app handling
+            });
+            console.log('Email verification sent successfully to:', email);
+        } catch (emailError) {
+            // Log error but don't throw - registration should succeed even if email fails
+            console.error('Failed to send email verification:', emailError);
+            // You might want to store this error or notify the user separately
+        }
 
         return user;
     },
