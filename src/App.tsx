@@ -14,6 +14,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Booking from "./pages/Booking";
 import Bookings from "./pages/Bookings";
 import Reviews from "./pages/Reviews";
 import NotFound from "./pages/NotFound";
@@ -36,7 +37,8 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/booking" element={<Booking />} />
                 <Route path="/bookings" element={<Bookings />} />
                 <Route path="/reviews" element={<Reviews />} />
                 <Route path="/login" element={<Login />} />

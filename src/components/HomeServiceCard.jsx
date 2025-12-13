@@ -1,8 +1,29 @@
 import { motion } from 'framer-motion';
 import { Clock, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAppSelector } from '@/store/hooks';
+import { useToast } from '@/components/ui/use-toast';
 import GradientButton from './GradientButton';
 
 const HomeServiceCard = ({ service, index }) => {
+  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
+  const { toast } = useToast();
+
+  const handleBookNow = () => {
+    // Check if user is logged in
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Need to login to book any service",
+        variant: "default",
+      });
+      return;
+    }
+
+    // Navigate to booking page with service ID
+    navigate('/booking', { state: { serviceId: service.id } });
+  };
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -73,6 +94,7 @@ const HomeServiceCard = ({ service, index }) => {
             <GradientButton
               variant="primary"
               className="w-full group/btn"
+              onClick={handleBookNow}
             >
               <span className="flex items-center justify-center gap-2">
                 Book Now

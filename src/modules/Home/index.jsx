@@ -7,6 +7,7 @@ import HomeParallaxSection from './HomeParallaxSection';
 import HomeContactSection from './HomeContactSection';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchActiveServices } from '@/features/services/serviceThunk';
+import { fetchAllSalonHours } from '../../features/calendar/calendarThunk';
 
 const Home = () => {
   const dispatch = useAppDispatch();
@@ -14,6 +15,7 @@ const Home = () => {
 
   useEffect(() => {
     dispatch(fetchActiveServices());
+    dispatch(fetchAllSalonHours());
   }, [dispatch]);
 
   // Normalize and apply fallbacks to service data

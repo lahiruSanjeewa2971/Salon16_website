@@ -18,6 +18,7 @@ export const fetchActiveServices = createAsyncThunk(
     async(_, {rejectWithValue}) => {
         try {
             const services = await serviceService.getActiveServices();
+            console.log("services from thunk", services);
             return services;
         } catch (error) {
             console.error("fetchActiveServices thunk - Error caught:", error);
