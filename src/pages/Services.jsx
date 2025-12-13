@@ -15,10 +15,10 @@ const Services = () => {
             className="text-center max-w-3xl mx-auto"
           >
             <h1 className="text-5xl sm:text-6xl font-bold mb-6">
-              Our Premium
-              <span className="block mt-2 gradient-gold bg-clip-text text-transparent">
+              Our Services
+              {/* <span className="block mt-2 bg-clip-text">
                 Services
-              </span>
+              </span> */}
             </h1>
             <p className="text-xl text-white/90 leading-relaxed">
               Comprehensive beauty solutions tailored to perfection. Each service is crafted to exceed expectations.

@@ -1,60 +1,50 @@
+import { useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import heroImage from '@/assets/hero_version3.png';
 import HomeServicesSection from './HomeServicesSection';
 import HomeStatsSection from './HomeStatsSection';
 import HomeParallaxSection from './HomeParallaxSection';
 import HomeContactSection from './HomeContactSection';
-
-// Mock services data
-const mockServices = [
-  {
-    id: 1,
-    name: 'Premium Haircut',
-    price: 75,
-    duration: '45 min',
-    category: 'Hair',
-    image: 'https://images.unsplash.com/photo-1560869713-7d0a2a4c3b8e?w=800&h=600&fit=crop',
-    description: 'Expert haircut tailored to your style and face shape. Includes consultation, precision cut, and styling.',
-  },
-  {
-    id: 2,
-    name: 'Hair Coloring',
-    price: 150,
-    duration: '2 hours',
-    category: 'Hair',
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&h=600&fit=crop',
-    description: 'Professional hair coloring with premium products. Full color, highlights, or balayage techniques available.',
-  },
-  {
-    id: 3,
-    name: 'Hair Styling',
-    price: 60,
-    duration: '30 min',
-    category: 'Hair',
-    image: 'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&h=600&fit=crop',
-    description: 'Beautiful styling for any occasion. From elegant updos to modern waves, we create the perfect look.',
-  },
-  {
-    id: 4,
-    name: 'Beard Trim & Style',
-    price: 40,
-    duration: '25 min',
-    category: 'Beard',
-    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=600&fit=crop',
-    description: 'Professional beard trimming and styling. Precision shaping with hot towel treatment included.',
-  },
-  {
-    id: 5,
-    name: 'Full Beard Grooming',
-    price: 65,
-    duration: '40 min',
-    category: 'Beard',
-    image: 'https://images.unsplash.com/photo-1585747860715-2ba37e788b7d?w=800&h=600&fit=crop',
-    description: 'Complete beard grooming experience. Includes trim, shape, hot towel, and premium beard oil treatment.',
-  }
-];
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchActiveServices } from '@/features/services/serviceThunk';
 
 const Home = () => {
+  const dispatch = useAppDispatch();
+  const { activeServices, isLoading, error } = useAppSelector((state) => state.services);
+
+  useEffect(() => {
+    dispatch(fetchActiveServices());
+  }, [dispatch]);
+
+  // Normalize and apply fallbacks to service data
+  const services = useMemo(
+    () =>
+      (activeServices || []).map((service) => {
+        const category =
+          service?.category && typeof service.category === 'object'
+            ? service.category
+            : { id: 'unknown', name: typeof service?.category === 'string' ? service.category : 'General' };
+
+        return {
+          id: service.id,
+          name: service.name || 'Service',
+          description: service.description || 'Professional service',
+          price: service.price || 0,
+          duration: service.duration || '30 min',
+          category,
+          color: service.color || '#6C2A52',
+          icon: service.icon || 'cut-outline',
+          image: service.image || 'https://via.placeholder.com/300x200',
+          popular: service.popular || false,
+          isActive: service.isActive ?? true,
+          createdAt: service.createdAt,
+          updatedAt: service.updatedAt,
+          publicId: service.publicId,
+        };
+      }),
+    [activeServices]
+  );
+
   return (
     <div className="min-h-screen">
       {/* Hero Image Section */}
@@ -109,7 +99,7 @@ const Home = () => {
       <div className="w-full border-t border-border/50" />
 
       {/* Our Services Section */}
-      <HomeServicesSection services={mockServices} />
+      <HomeServicesSection services={services} />
 
       {/* Divider */}
       {/* <div className="w-full border-t border-border/50" /> */}

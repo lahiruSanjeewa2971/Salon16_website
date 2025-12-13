@@ -33,7 +33,7 @@ const HomeServiceCard = ({ service, index }) => {
             transition={{ delay: index * 0.1 + 0.3, type: 'spring' }}
             className="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary/90 backdrop-blur-sm text-primary-foreground text-xs font-semibold"
           >
-            {service.category}
+            {service.category?.name || service.category || 'General'}
           </motion.div>
         </div>
 
