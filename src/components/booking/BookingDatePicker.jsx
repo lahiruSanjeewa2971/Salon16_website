@@ -8,6 +8,14 @@ const BookingDatePicker = ({ selectedDate, onDateSelect, salonHours }) => {
   const scrollContainerRef = useRef(null);
   const { toast } = useToast();
 
+  // Helper function to format date as YYYY-MM-DD in local time (not UTC)
+  const formatDateLocal = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Generate array of dates starting from today (next 30 days)
   const generateDates = () => {
     const dates = [];
@@ -112,7 +120,7 @@ const BookingDatePicker = ({ selectedDate, onDateSelect, salonHours }) => {
           className="flex gap-3 overflow-x-auto py-4 px-1 md:px-12 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {dates.map((date, index) => {
-            const dateString = date.toISOString().split('T')[0];
+            const dateString = formatDateLocal(date);
             const isPast = date < new Date().setHours(0, 0, 0, 0);
             const dayData = salonHours?.find((h) => h.id === dateString);
             const dayOfWeek = date.getDay();

@@ -8,14 +8,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Layout from "@/components/layout/Layout";
 import Home from "@/modules/Home";
+import Bookings from "@/modules/Bookings";
+import Contact from "@/modules/Contact";
 import Services from "./pages/Services";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
-import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Booking from "./pages/Booking";
-import Bookings from "./pages/Bookings";
 import Reviews from "./pages/Reviews";
 import NotFound from "./pages/NotFound";
 import AuthInitializer from "@/components/AuthInitializer"

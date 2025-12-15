@@ -37,10 +37,10 @@ const About = () => {
             className="text-center max-w-3xl mx-auto"
           >
             <h1 className="text-5xl sm:text-6xl font-bold mb-6">
-              About
-              <span className="block mt-2 gradient-gold bg-clip-text text-transparent">
+              About Salon16
+              {/* <span className="block mt-2 gradient-gold bg-clip-text text-transparent">
                 Salon16
-              </span>
+              </span> */}
             </h1>
             <p className="text-xl text-white/90 leading-relaxed">
               Where luxury meets innovation in beauty salon management
@@ -82,7 +82,7 @@ const About = () => {
           >
             <h2 className="text-4xl font-bold mb-4">
               Our
-              <span className="gradient-primary bg-clip-text text-transparent"> Values</span>
+              <span className="bg-clip-text"> Values</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               The principles that guide every decision we make
@@ -113,7 +113,7 @@ const About = () => {
       </section>
 
       {/* Team Section */}
-      <section className="py-20 bg-background">
+      {/* <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -154,7 +154,7 @@ const About = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Mission Section */}
       <section className="py-20 gradient-luxury text-white">

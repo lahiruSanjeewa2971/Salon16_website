@@ -13,6 +13,11 @@ const Home = () => {
   const dispatch = useAppDispatch();
   const { activeServices, isLoading, error } = useAppSelector((state) => state.services);
 
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
   useEffect(() => {
     dispatch(fetchActiveServices());
     dispatch(fetchAllSalonHours());

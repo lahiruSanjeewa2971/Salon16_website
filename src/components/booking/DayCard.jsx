@@ -3,7 +3,15 @@ import { Calendar, Lock, XCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const DayCard = ({ date, salonHours, isSelected, onClick, isPast }) => {
-  const dateString = date.toISOString().split('T')[0];
+  // Helper function to format date as YYYY-MM-DD in local time (not UTC)
+  const formatDateLocal = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const dateString = formatDateLocal(date);
   const dayData = salonHours?.find((h) => h.id === dateString);
   const dayOfWeek = date.getDay();
   const isTuesday = dayOfWeek === 2;

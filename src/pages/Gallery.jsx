@@ -14,7 +14,7 @@ const Gallery = () => {
           >
             <h1 className="text-5xl sm:text-6xl font-bold mb-6">
               Our Work
-              <span className="block mt-2 gradient-gold bg-clip-text text-transparent">
+              <span className="block mt-2 bg-clip-text">
                 Speaks Volumes
               </span>
             </h1>

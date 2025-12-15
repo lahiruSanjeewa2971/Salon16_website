@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Clock, X } from 'lucide-react';
-import { useAppSelector } from '@/store/hooks';
+import { ArrowLeft, Clock, X, Loader2 } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
+import { createBooking } from '@/features/bookings/bookingThunk';
 import BookingServiceInfo from '@/components/booking/BookingServiceInfo';
 import BookingDatePicker from '@/components/booking/BookingDatePicker';
 import BookingTimeSlotPicker from '@/components/booking/BookingTimeSlotPicker';
@@ -13,8 +15,12 @@ import ScreenSkeleton from '@/components/common/ScreenSkeleton';
 const Booking = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const { toast } = useToast();
   const { salonHours } = useAppSelector((state) => state.calendar);
   const { activeServices } = useAppSelector((state) => state.services);
+  const { user } = useAppSelector((state) => state.auth);
+  const { isCreating } = useAppSelector((state) => state.bookings);
 
   // Get service from location state or find by ID
   const serviceId = location.state?.serviceId;
@@ -91,13 +97,95 @@ const Booking = () => {
     setSelectedTime(null);
   };
 
-  const handleConfirmBooking = () => {
-    // TODO: Implement booking creation
-    console.log('Booking confirmed:', {
-      serviceId: service.id,
+  const handleConfirmBooking = async () => {
+    console.log("selectedDate", selectedDate);
+    console.log("selectedTime", selectedTime);
+    if (!user || !service || !selectedDate || !selectedTime) {
+      toast({
+        title: 'Error',
+        description: 'Please ensure all booking details are selected.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Prepare booking data
+    // User object from Redux has 'id' property (not 'uid')
+    const customerId = user.id || user.uid || null;
+    const customerName = user.displayName || 
+      (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 
+       user.firstName || user.lastName || user.email || 'Customer');
+
+    if (!customerId) {
+      toast({
+        title: 'Error',
+        description: 'User information is missing. Please login again.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const bookingData = {
+      adminNote: '',
+      categoryId: service.category?.id || null,
+      categoryName: service.category?.name || service.category || 'General',
+      customerId: customerId,
+      customerName: customerName,
       date: selectedDate,
+      notes: '',
+      rescheduledCount: 0,
+      serviceDuration: service.duration || 30,
+      serviceId: service.id,
+      serviceName: service.name,
+      servicePrice: service.price,
+      status: 'pending',
       time: selectedTime,
-    });
+    };
+
+    try {
+      const result = await dispatch(createBooking(bookingData));
+      
+      if (createBooking.fulfilled.match(result)) {
+        const [hours, minutes] = selectedTime.split(':').map(Number);
+        const formattedTime = new Date(2000, 0, 1, hours, minutes).toLocaleTimeString('en-US', {
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+        });
+        const formattedDate = new Date(selectedDate).toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+        
+        toast({
+          title: 'Booking Confirmed!',
+          description: `Your booking for ${service.name} on ${formattedDate} at ${formattedTime} has been confirmed.`,
+        });
+        
+        // Reset selections
+        setSelectedDate(null);
+        setSelectedTime(null);
+        
+        // Redirect to home screen after a short delay to show the toast
+        setTimeout(() => {
+          navigate('/');
+        }, 1500);
+      } else if (createBooking.rejected.match(result)) {
+        toast({
+          title: 'Booking Failed',
+          description: result.payload || 'Failed to create booking. Please try again.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -195,10 +283,18 @@ const Booking = () => {
                 <div className="mt-6">
                   <Button
                     onClick={handleConfirmBooking}
+                    disabled={isCreating}
                     className="w-full lg:w-auto px-8 py-6 text-lg"
                     size="lg"
                   >
-                    Confirm Booking
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Creating Booking...
+                      </>
+                    ) : (
+                      'Confirm Booking'
+                    )}
                   </Button>
                 </div>
               </motion.div>
