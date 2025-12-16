@@ -69,9 +69,9 @@ const ScreenSkeleton = (props) => {
   // Grid layout
   if (layout === 'grid') {
     return (
-      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}>
+      <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start ${className}`}>
         {Array.from({ length: gridItems }).map((_, index) => (
-          <div key={index} className="space-y-4">
+          <div key={index} className="space-y-4 h-full flex flex-col">
             {showImage && <Skeleton className="w-full h-48 rounded-xl" />}
             {showTitle && <Skeleton className="h-6 w-3/4" />}
             {showDescription && <Skeleton className="h-4 w-full" />}

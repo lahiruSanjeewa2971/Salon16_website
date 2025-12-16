@@ -24,6 +24,7 @@ const Booking = () => {
 
   // Get service from location state or find by ID
   const serviceId = location.state?.serviceId;
+  const bookingFrom = location.state?.from || 'home';
   const service = activeServices?.find((s) => s.id === serviceId);
 
   const [selectedDate, setSelectedDate] = useState(null);
@@ -70,14 +71,16 @@ const Booking = () => {
     );
   }
 
-  // If no service, redirect to home
+  // If no service, redirect appropriately
   if (!service) {
     // Could redirect or show error
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-muted-foreground mb-4">No service selected</p>
-          <Button onClick={() => navigate('/')}>Go to Home</Button>
+          <Button onClick={() => navigate(bookingFrom === 'services' ? '/services' : '/')}>
+            Go to {bookingFrom === 'services' ? 'Services' : 'Home'}
+          </Button>
         </div>
       </div>
     );
@@ -168,9 +171,9 @@ const Booking = () => {
         setSelectedDate(null);
         setSelectedTime(null);
         
-        // Redirect to home screen after a short delay to show the toast
+        // Redirect after a short delay to show the toast
         setTimeout(() => {
-          navigate('/');
+          navigate(bookingFrom === 'services' ? '/services' : '/');
         }, 1500);
       } else if (createBooking.rejected.match(result)) {
         toast({

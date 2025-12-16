@@ -3,6 +3,7 @@ import authReducer from '../features/auth/authSlice'
 import serviceReducer from '../features/services/serviceSlice'
 import calendarReducer from '../features/calendar/calendarSlice'
 import bookingReducer from '../features/bookings/bookingSlice'
+import categoryReducer from '../features/categories/categorySlice'
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         services: serviceReducer,
         calendar: calendarReducer,
         bookings: bookingReducer,
+        categories: categoryReducer,
     },
     
     // below is to ignore the serializable check for the persist/PERSIST action.

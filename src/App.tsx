@@ -10,7 +10,7 @@ import Layout from "@/components/layout/Layout";
 import Home from "@/modules/Home";
 import Bookings from "@/modules/Bookings";
 import Contact from "@/modules/Contact";
-import Services from "./pages/Services";
+import Services from "@/modules/Services";
 import Gallery from "./pages/Gallery";
 import About from "./pages/About";
 import Login from "./pages/Login";

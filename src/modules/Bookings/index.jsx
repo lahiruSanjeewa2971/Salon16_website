@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
@@ -6,6 +6,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { fetchUserBookings, cancelBooking, deleteBooking } from '@/features/bookings/bookingThunk';
 import ScreenSkeleton from '@/components/common/ScreenSkeleton';
 import BookingsList from './BookingsList';
+import BookingsFilter from './BookingsFilter';
 
 const Bookings = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Bookings = () => {
   const { toast } = useToast();
   const { user } = useAppSelector((state) => state.auth);
   const { userBookings, isLoading, isDeleting } = useAppSelector((state) => state.bookings);
+  const [filterDate, setFilterDate] = useState('');
 
   // Scroll to top on mount
   useEffect(() => {
@@ -26,17 +28,46 @@ const Bookings = () => {
     }
   }, [dispatch, user?.id]);
 
-  // Redirect if not logged in
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <p className="text-muted-foreground mb-4">Please login to view your bookings</p>
-          <Button onClick={() => navigate('/login')}>Go to Login</Button>
-        </div>
-      </div>
-    );
-  }
+  // Filter and sort bookings by date and time (latest first)
+  const filteredAndSortedBookings = useMemo(() => {
+    if (!userBookings || userBookings.length === 0) return [];
+
+    // Filter by date if filterDate is set
+    let filtered = userBookings;
+    if (filterDate) {
+      filtered = userBookings.filter((booking) => {
+        // Compare dates only (ignore time)
+        const bookingDate = new Date(booking.date);
+        const filterDateObj = new Date(filterDate);
+        
+        // Set both to start of day for comparison
+        bookingDate.setHours(0, 0, 0, 0);
+        filterDateObj.setHours(0, 0, 0, 0);
+        
+        return bookingDate.getTime() === filterDateObj.getTime();
+      });
+    }
+
+    // Sort by date and time (latest first)
+    return [...filtered].sort((a, b) => {
+      // First, compare dates
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      
+      if (dateA.getTime() !== dateB.getTime()) {
+        // If dates are different, sort by date (descending - latest first)
+        return dateB.getTime() - dateA.getTime();
+      }
+      
+      // If dates are the same, sort by time (descending - latest first)
+      const [hoursA, minutesA] = a.time.split(':').map(Number);
+      const [hoursB, minutesB] = b.time.split(':').map(Number);
+      const timeA = hoursA * 60 + minutesA; // Convert to minutes for easy comparison
+      const timeB = hoursB * 60 + minutesB;
+      
+      return timeB - timeA;
+    });
+  }, [userBookings, filterDate]);
 
   const handleCancelBooking = async (bookingId) => {
     try {
@@ -91,29 +122,17 @@ const Bookings = () => {
     console.log('Reschedule booking:', bookingId);
   };
 
-  // Sort bookings by date and time (earliest first)
-  const sortedBookings = useMemo(() => {
-    if (!userBookings || userBookings.length === 0) return [];
-
-    return [...userBookings].sort((a, b) => {
-      // First, compare dates
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      
-      if (dateA.getTime() !== dateB.getTime()) {
-        // If dates are different, sort by date (ascending - earliest first)
-        return dateA.getTime() - dateB.getTime();
-      }
-      
-      // If dates are the same, sort by time (ascending - earliest first)
-      const [hoursA, minutesA] = a.time.split(':').map(Number);
-      const [hoursB, minutesB] = b.time.split(':').map(Number);
-      const timeA = hoursA * 60 + minutesA; // Convert to minutes for easy comparison
-      const timeB = hoursB * 60 + minutesB;
-      
-      return timeA - timeB;
-    });
-  }, [userBookings]);
+  // Redirect if not logged in
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">Please login to view your bookings</p>
+          <Button onClick={() => navigate('/login')}>Go to Login</Button>
+        </div>
+      </div>
+    );
+  }
 
   // Show skeleton loader while loading
   if (isLoading) {
@@ -146,9 +165,14 @@ const Bookings = () => {
           <p className="text-muted-foreground">View and manage your service bookings</p>
         </div>
 
+        {/* Date Filter */}
+        {!isLoading && userBookings.length > 0 && (
+          <BookingsFilter onFilterChange={setFilterDate} />
+        )}
+
         {/* Bookings List */}
         <BookingsList
-          bookings={sortedBookings}
+          bookings={filteredAndSortedBookings}
           onCancel={handleCancelBooking}
           onDelete={handleDeleteBooking}
           onReschedule={handleRescheduleBooking}

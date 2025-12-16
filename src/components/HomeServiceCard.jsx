@@ -5,7 +5,7 @@ import { useAppSelector } from '@/store/hooks';
 import { useToast } from '@/components/ui/use-toast';
 import GradientButton from './GradientButton';
 
-const HomeServiceCard = ({ service, index }) => {
+const HomeServiceCard = ({ service, index, origin = 'home' }) => {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
   const { toast } = useToast();
@@ -22,7 +22,7 @@ const HomeServiceCard = ({ service, index }) => {
     }
 
     // Navigate to booking page with service ID
-    navigate('/booking', { state: { serviceId: service.id } });
+    navigate('/booking', { state: { serviceId: service.id, from: origin } });
   };
   return (
     <motion.div
