@@ -15,6 +15,7 @@ const Bookings = () => {
   const { user } = useAppSelector((state) => state.auth);
   const { userBookings, isLoading, isDeleting } = useAppSelector((state) => state.bookings);
   const [filterDate, setFilterDate] = useState('');
+  const [filterStatus, setFilterStatus] = useState('');
 
   // Scroll to top on mount
   useEffect(() => {
@@ -32,10 +33,12 @@ const Bookings = () => {
   const filteredAndSortedBookings = useMemo(() => {
     if (!userBookings || userBookings.length === 0) return [];
 
-    // Filter by date if filterDate is set
+    // Apply filters
     let filtered = userBookings;
+
+    // Filter by date if filterDate is set
     if (filterDate) {
-      filtered = userBookings.filter((booking) => {
+      filtered = filtered.filter((booking) => {
         // Compare dates only (ignore time)
         const bookingDate = new Date(booking.date);
         const filterDateObj = new Date(filterDate);
@@ -45,6 +48,13 @@ const Bookings = () => {
         filterDateObj.setHours(0, 0, 0, 0);
         
         return bookingDate.getTime() === filterDateObj.getTime();
+      });
+    }
+
+    // Filter by status if filterStatus is set
+    if (filterStatus) {
+      filtered = filtered.filter((booking) => {
+        return booking.status === filterStatus;
       });
     }
 
@@ -67,7 +77,7 @@ const Bookings = () => {
       
       return timeB - timeA;
     });
-  }, [userBookings, filterDate]);
+  }, [userBookings, filterDate, filterStatus]);
 
   const handleCancelBooking = async (bookingId) => {
     try {
@@ -165,9 +175,14 @@ const Bookings = () => {
           <p className="text-muted-foreground">View and manage your service bookings</p>
         </div>
 
-        {/* Date Filter */}
+        {/* Filters */}
         {!isLoading && userBookings.length > 0 && (
-          <BookingsFilter onFilterChange={setFilterDate} />
+          <BookingsFilter 
+            onDateFilterChange={setFilterDate}
+            onStatusFilterChange={setFilterStatus}
+            selectedDate={filterDate}
+            selectedStatus={filterStatus}
+          />
         )}
 
         {/* Bookings List */}
