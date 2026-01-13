@@ -44,7 +44,7 @@ const Gallery = () => {
       </section>
 
       {/* Process Section */}
-      <section className="py-20 bg-secondary/20">
+      {/* <section className="py-20 bg-secondary/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -85,10 +85,10 @@ const Gallery = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Instagram CTA */}
-      <section className="py-20 bg-background">
+      {/* <section className="py-20 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -111,7 +111,7 @@ const Gallery = () => {
             </motion.a>
           </motion.div>
         </div>
-      </section>
+      </section> */}
 
     </div>
   );

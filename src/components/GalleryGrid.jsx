@@ -85,7 +85,7 @@ const GalleryGrid = () => {
         })}
       </div>
 
-      // Lightbox Modal
+      {/* // Lightbox Modal */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div
