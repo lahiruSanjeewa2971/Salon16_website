@@ -39,11 +39,17 @@ const Navbar = () => {
   useEffect(() => {
     if (isOpen && isMobile) {
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
     }
     return () => {
       document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
     };
   }, [isOpen, isMobile]);
 
@@ -66,11 +72,10 @@ const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background w-full max-w-full ${
-        isScrolled 
-          ? 'backdrop-blur-lg shadow-elegant border-b border-border/50' 
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-background w-full max-w-full ${isScrolled
+          ? 'backdrop-blur-lg shadow-elegant border-b border-border/50'
           : 'backdrop-blur-md'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`flex items-center justify-between ${isMobile ? 'h-20 py-3' : 'h-24 py-4'}`}>
@@ -100,9 +105,8 @@ const Navbar = () => {
                     <Link
                       key={link.path}
                       to={link.path}
-                      className={`relative px-5 py-2.5 text-sm font-medium transition-smooth rounded-lg hover:bg-secondary/50 ${
-                        location.pathname === link.path ? 'text-primary' : 'text-foreground'
-                      }`}
+                      className={`relative px-5 py-2.5 text-sm font-medium transition-smooth rounded-lg hover:bg-secondary/50 ${location.pathname === link.path ? 'text-primary' : 'text-foreground'
+                        }`}
                     >
                       {link.name}
                       {location.pathname === link.path && (
@@ -154,7 +158,7 @@ const Navbar = () => {
                 onClick={() => setIsOpen(false)}
                 className="fixed inset-0 bg-black/60 backdrop-blur-md z-[55]"
               />
-              
+
               {/* Full Screen Menu */}
               <motion.div
                 initial={{ opacity: 0, x: '100%' }}
@@ -176,7 +180,7 @@ const Navbar = () => {
                     <X size={24} />
                   </button>
                 </div>
-                
+
                 {/* Centered Navigation Links */}
                 <div className="flex-1 flex items-center justify-center min-h-0 py-8">
                   <div className="w-full max-w-md px-4 sm:px-6 space-y-3">
@@ -190,11 +194,10 @@ const Navbar = () => {
                         <Link
                           to={link.path}
                           onClick={() => setIsOpen(false)}
-                          className={`block py-4 px-6 rounded-lg transition-smooth font-medium text-lg text-center ${
-                            location.pathname === link.path
+                          className={`block py-4 px-6 rounded-lg transition-smooth font-medium text-lg text-center ${location.pathname === link.path
                               ? 'bg-primary text-primary-foreground shadow-md'
                               : 'hover:bg-secondary text-foreground'
-                          }`}
+                            }`}
                         >
                           {link.name}
                         </Link>
@@ -202,7 +205,7 @@ const Navbar = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 {/* Auth Buttons at Bottom */}
                 <div className="w-full px-4 sm:px-6 pb-6 sm:pb-8 pt-6 border-t border-border bg-muted/30 flex-shrink-0">
                   <AuthButtons isMobile={true} />
