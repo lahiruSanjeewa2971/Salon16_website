@@ -37,8 +37,8 @@ const BookingServiceInfo = ({ service }) => {
             <span className="text-sm font-medium">{service.duration} min</span>
           </div>
           <div className="flex items-center gap-2 text-foreground">
-            <DollarSign size={20} />
-            <span className="text-2xl font-bold">${service.price}</span>
+            {/* <DollarSign size={20} /> */}
+            <span className="text-2xl font-bold">Rs: {service.price}</span>
           </div>
         </div>
       </div>

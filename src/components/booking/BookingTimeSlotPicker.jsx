@@ -18,7 +18,7 @@ const BookingTimeSlotPicker = ({ selectedDate, salonHours, serviceDuration, sele
 
   // Get bookings for selected date
   const existingBookings = bookingsByDate[selectedDate] || [];
-  console.log("existingBookings", existingBookings);
+  // console.log("existingBookings", existingBookings); s
   const hasBookings = existingBookings.length > 0;
 
   // Check if selected date is today

@@ -47,6 +47,25 @@ export const bookingService = {
             throw error;
         }
     },
+    
+    // Get all bookings in the collection
+    getAllBookings: async () => {
+        try {
+            const bookingsRef = collection(db, BOOKINGS_COLLECTION);
+            const snapshot = await getDocs(bookingsRef);
+
+            return snapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    ...convertTimestamps(data),
+                };
+            });
+        } catch (error) {
+            console.error('Error fetching all bookings:', error);
+            throw error;
+        }
+    },
 
     // Get active bookings for a specific date (exclude cancelled/rejected)
     getActiveBookingsByDate: async (dateString) => {

@@ -221,7 +221,7 @@ const Booking = () => {
                   <Clock size={18} />
                   <span className="text-sm font-medium">{service.duration} min</span>
                 </div>
-                <div className="text-2xl font-bold text-foreground">${service.price}</div>
+                <div className="text-2xl font-bold text-foreground">Rs: {service.price}</div>
               </div>
             </div>
 
@@ -247,7 +247,6 @@ const Booking = () => {
               <BookingDatePicker
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
-                salonHours={salonHours}
               />
             </div>
 

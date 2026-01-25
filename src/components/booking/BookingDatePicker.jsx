@@ -1,12 +1,22 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchSalonHours } from '@/features/salonHours/salonHoursThunk';
 import DayCard from './DayCard';
 
-const BookingDatePicker = ({ selectedDate, onDateSelect, salonHours }) => {
+const BookingDatePicker = ({ selectedDate, onDateSelect }) => {
   const scrollContainerRef = useRef(null);
   const { toast } = useToast();
+  const dispatch = useAppDispatch();
+  const { salonHours } = useAppSelector((state) => state.salonHours);
+
+  useEffect(() => {
+    dispatch(fetchSalonHours());
+  }, [dispatch]);
+
+  const memoizedSalonHours = useMemo(() => salonHours, [salonHours]);
 
   // Helper function to format date as YYYY-MM-DD in local time (not UTC)
   const formatDateLocal = (date) => {
@@ -37,7 +47,7 @@ const BookingDatePicker = ({ selectedDate, onDateSelect, salonHours }) => {
     const date = new Date(dateString);
     const dayOfWeek = date.getDay();
     const isTuesday = dayOfWeek === 2;
-    const dayData = salonHours?.find((h) => h.id === dateString);
+    const dayData = memoizedSalonHours?.find((h) => h.id === dateString);
 
     if (date < new Date().setHours(0, 0, 0, 0)) return false;
     if (isTuesday && !dayData) return false;
@@ -52,7 +62,7 @@ const BookingDatePicker = ({ selectedDate, onDateSelect, salonHours }) => {
     const date = new Date(dateString);
     const dayOfWeek = date.getDay();
     const isTuesday = dayOfWeek === 2;
-    const dayData = salonHours?.find((h) => h.id === dateString);
+    const dayData = memoizedSalonHours?.find((h) => h.id === dateString);
 
     if (date < new Date().setHours(0, 0, 0, 0)) return 'This date is in the past';
     if (isTuesday && !dayData) return 'Tuesday is closed';
@@ -122,7 +132,7 @@ const BookingDatePicker = ({ selectedDate, onDateSelect, salonHours }) => {
           {dates.map((date, index) => {
             const dateString = formatDateLocal(date);
             const isPast = date < new Date().setHours(0, 0, 0, 0);
-            const dayData = salonHours?.find((h) => h.id === dateString);
+            const dayData = memoizedSalonHours?.find((h) => h.id === dateString);
             const dayOfWeek = date.getDay();
             const isTuesday = dayOfWeek === 2;
 
@@ -138,7 +148,7 @@ const BookingDatePicker = ({ selectedDate, onDateSelect, salonHours }) => {
               <DayCard
                 key={dateString}
                 date={date}
-                salonHours={salonHours}
+                salonHours={memoizedSalonHours}
                 isSelected={selectedDate === dateString}
                 onClick={handleDateClick}
                 isPast={isPast}

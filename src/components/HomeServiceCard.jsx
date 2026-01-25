@@ -80,8 +80,8 @@ const HomeServiceCard = ({ service, index, origin = 'home' }) => {
               <span className="text-sm font-medium">{service.duration}</span>
             </div>
             <div className="text-right">
-              <span className="text-2xl md:text-3xl font-bold text-foreground">
-                ${service.price}
+              <span className="text-2xl md:text-2xl font-bold text-foreground">
+                Rs:{service.price}
               </span>
             </div>
           </div>

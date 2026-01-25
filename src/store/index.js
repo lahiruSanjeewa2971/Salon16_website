@@ -4,6 +4,7 @@ import serviceReducer from '../features/services/serviceSlice'
 import calendarReducer from '../features/calendar/calendarSlice'
 import bookingReducer from '../features/bookings/bookingSlice'
 import categoryReducer from '../features/categories/categorySlice'
+import salonHoursReducer from '../features/salonHours/salonHoursSlice'
 
 export const store = configureStore({
     reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
         calendar: calendarReducer,
         bookings: bookingReducer,
         categories: categoryReducer,
+        salonHours: salonHoursReducer,
     },
     
     // below is to ignore the serializable check for the persist/PERSIST action.

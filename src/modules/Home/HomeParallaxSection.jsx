@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { Users, CheckCircle, Calendar } from 'lucide-react';
 import parallaxImage from '@/assets/home_screen_scrolling_2.jpg';
+import { bookingService } from '@/services/firestore/bookingService';
 
 const StatCard = ({ icon: Icon, value, label, index }) => {
     return (
@@ -52,23 +54,66 @@ const StatCard = ({ icon: Icon, value, label, index }) => {
 };
 
 const HomeParallaxSection = () => {
-    const stats = [
-        {
-            icon: Users,
-            value: '10K+',
-            label: 'Happy Clients',
-        },
-        {
-            icon: CheckCircle,
-            value: '500+',
-            label: 'Services Completed',
-        },
-        {
-            icon: Calendar,
-            value: '15+',
-            label: 'Years Experience',
-        },
-    ];
+  const [happyClients, setHappyClients] = useState(0);
+  const [servicesCompleted, setServicesCompleted] = useState(0);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchStats = async () => {
+      try {
+        const allBookings = await bookingService.getAllBookings();
+        // console.log('All bookings for stats:', allBookings);
+
+        if (!mounted || !Array.isArray(allBookings)) return;
+
+        const accepted = allBookings.filter((b) => {
+          const status = (b && b.status) ? String(b.status).toLowerCase() : '';
+          return status === 'accepted';
+        });
+
+        // Services completed = number of accepted bookings
+        const completedCount = accepted.length || 0;
+
+        // Happy clients = unique customerId among accepted bookings (ignore null/undefined)
+        const unique = new Set();
+        accepted.forEach((b) => {
+          if (b && b.customerId) unique.add(b.customerId);
+        });
+
+        if (mounted) {
+          setServicesCompleted(completedCount);
+          setHappyClients(unique.size || 0);
+        }
+      } catch (err) {
+        console.error('Failed to fetch bookings for stats:', err);
+      }
+    };
+
+    fetchStats();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const stats = [
+    {
+      icon: Users,
+      value: (happyClients + 20 || 0).toString(),
+      label: 'Happy Clients',
+    },
+    {
+      icon: CheckCircle,
+      value: (servicesCompleted + 40 || 0).toString(),
+      label: 'Services Completed',
+    },
+    {
+      icon: Calendar,
+      value: '3+',
+      label: 'Years Experience',
+    },
+  ];
 
   return (
     <section className="relative w-full h-[78vh] min-h-[300px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] max-h-[800px] overflow-hidden my-8 sm:my-12 md:my-16">
