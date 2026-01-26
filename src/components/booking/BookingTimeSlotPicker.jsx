@@ -55,22 +55,13 @@ const BookingTimeSlotPicker = ({ selectedDate, salonHours, serviceDuration, sele
 
   // Check if a time slot is available
   const isSlotAvailable = (slotStartMinutes, slotEndMinutes, bookings) => {
-    const BUFFER_MINUTES = 20;
-
     for (const booking of bookings) {
       const bookingStartMinutes = timeToMinutes(booking.time);
       const bookingEndMinutes = bookingStartMinutes + (booking.serviceDuration || 30);
-      
-      // Calculate buffer zones
-      const bookingBufferStart = bookingStartMinutes - BUFFER_MINUTES;
-      const bookingBufferEnd = bookingEndMinutes + BUFFER_MINUTES;
+      const bookingBufferEnd = bookingEndMinutes + 15;
 
-      // Check if slot overlaps with booking + buffer
-      if (
-        (slotStartMinutes >= bookingBufferStart && slotStartMinutes < bookingBufferEnd) ||
-        (slotEndMinutes > bookingBufferStart && slotEndMinutes <= bookingBufferEnd) ||
-        (slotStartMinutes <= bookingBufferStart && slotEndMinutes >= bookingBufferEnd)
-      ) {
+      // Check if slot overlaps with booking or within 10 min after
+      if (slotStartMinutes < bookingBufferEnd && slotEndMinutes > bookingStartMinutes) {
         return false;
       }
     }
@@ -105,6 +96,7 @@ const BookingTimeSlotPicker = ({ selectedDate, salonHours, serviceDuration, sele
     );
 
     while (currentMinutes + slotDuration <= closingTimeWithBuffer) {
+      const slotStartMinutes = currentMinutes;
       const slotEndMinutes = currentMinutes + slotDuration;
       const timeString = minutesToTime(currentMinutes);
 
@@ -127,7 +119,23 @@ const BookingTimeSlotPicker = ({ selectedDate, salonHours, serviceDuration, sele
         isPast,
       });
 
-      currentMinutes += slotDuration;
+      if (!isPast && isAvailable) {
+        currentMinutes += slotDuration;
+      } else if (isPast) {
+        currentMinutes += slotDuration;
+      } else {
+        // Unavailable due to booking, skip to next available start time
+        let maxBufferEnd = currentMinutes;
+        for (const booking of activeBookings) {
+          const bookingStartMinutes = timeToMinutes(booking.time);
+          const bookingEndMinutes = bookingStartMinutes + (booking.serviceDuration || 30);
+          const bookingBufferEnd = bookingEndMinutes + 15;
+          if (slotStartMinutes < bookingBufferEnd && slotEndMinutes > bookingStartMinutes) {
+            maxBufferEnd = Math.max(maxBufferEnd, bookingBufferEnd);
+          }
+        }
+        currentMinutes = maxBufferEnd;
+      }
     }
 
     return slots;
