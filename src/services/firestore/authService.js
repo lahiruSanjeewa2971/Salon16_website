@@ -1,13 +1,18 @@
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged, sendEmailVerification, updateProfile } from 'firebase/auth';
-import { auth, db } from '@/config/firebase';
 import {collection, doc, getDoc, setDoc, serverTimestamp} from 'firebase/firestore'
+import { auth, db } from '@/config/firebase';
 
 const USER_COLLECTION = 'users';
 
 export const authService = {
     login: async (email, password) => {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        return userCredential.user;
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            return userCredential.user;   
+        } catch (error) {
+            console.error("Login error:", error);
+            throw error;
+        }
     },
 
     register: async (email, password, firstName, lastName) => {

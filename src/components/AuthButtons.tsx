@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { LogIn, UserPlus, LogOut, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { logoutUser } from '@/features/auth/authThunk';
 import { useToast } from '@/components/ui/use-toast';
@@ -19,6 +19,7 @@ interface AuthButtonsProps {
 }
 
 const AuthButtons = ({ isMobile = false }: AuthButtonsProps) => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { toast } = useToast();
   const { user, isLoading } = useAppSelector((state: any) => state.auth);
@@ -31,6 +32,7 @@ const AuthButtons = ({ isMobile = false }: AuthButtonsProps) => {
         title: 'Logged out',
         description: 'You have been logged out successfully.',
       });
+      navigate('/');
     } else {
       toast({
         title: 'Logout failed',
