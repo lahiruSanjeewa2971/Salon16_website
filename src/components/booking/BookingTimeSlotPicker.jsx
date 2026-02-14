@@ -90,9 +90,9 @@ const BookingTimeSlotPicker = ({ selectedDate, salonHours, serviceDuration, sele
     const slots = [];
     let currentMinutes = openMinutes;
 
-    // Filter bookings to only active ones (pending, accepted)
+    // Filter bookings/summaries to only active ones (treat missing status as active/pending)
     const activeBookings = existingBookings.filter(
-      (b) => b.status === 'pending' || b.status === 'accepted'
+      (b) => b.status == null || b.status === 'pending' || b.status === 'accepted'
     );
 
     while (currentMinutes + slotDuration <= closingTimeWithBuffer) {

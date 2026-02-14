@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Clock, X, Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { createBooking } from '@/features/bookings/bookingThunk';
 import BookingServiceInfo from '@/components/booking/BookingServiceInfo';
@@ -29,6 +31,12 @@ const Booking = () => {
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+
+  // Guest fields (shown only when user is not logged in)
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const [guestErrors, setGuestErrors] = useState({ name: '', email: '' });
+
   const [isLoading, setIsLoading] = useState(true);
 
   // Simulate loading for 3 seconds
@@ -89,6 +97,11 @@ const Booking = () => {
   const handleDateSelect = (dateString) => {
     setSelectedDate(dateString);
     setSelectedTime(null); // Reset time when date changes
+
+    // reset guest inputs when date changes
+    setGuestName('');
+    setGuestEmail('');
+    setGuestErrors({ name: '', email: '' });
   };
 
   const handleTimeSelect = (time) => {
@@ -100,10 +113,33 @@ const Booking = () => {
     setSelectedTime(null);
   };
 
+  const getGuestValidationErrors = (nameInput = guestName, emailInput = guestEmail) => {
+    const errors = { name: '', email: '' };
+    const name = String(nameInput || '').trim();
+    const email = String(emailInput || '').trim();
+
+    if (!name) errors.name = 'Name is required.';
+    else if (name.length < 2) errors.name = 'Name must be at least 2 characters.';
+
+    const emailRe = /^\S+@\S+\.\S+$/;
+    if (!email) errors.email = 'Email is required.';
+    else if (!emailRe.test(email)) errors.email = 'Enter a valid email address.';
+
+    return errors;
+  };
+
+  const validateGuest = () => {
+    const errors = getGuestValidationErrors();
+    setGuestErrors(errors);
+    return !errors.name && !errors.email;
+  };
+
+  // Derived boolean (no hooks) — faster and avoids hook-order issues during HMR
+  const errorsForCurrentInputs = getGuestValidationErrors(guestName, guestEmail);
+  const isGuestFormValid = user ? true : !errorsForCurrentInputs.name && !errorsForCurrentInputs.email;
+
   const handleConfirmBooking = async () => {
-    console.log("selectedDate", selectedDate);
-    console.log("selectedTime", selectedTime);
-    if (!user || !service || !selectedDate || !selectedTime) {
+    if (!service || !selectedDate || !selectedTime) {
       toast({
         title: 'Error',
         description: 'Please ensure all booking details are selected.',
@@ -112,21 +148,25 @@ const Booking = () => {
       return;
     }
 
-    // Prepare booking data
-    // User object from Redux has 'id' property (not 'uid')
-    const customerId = user.id || user.uid || null;
-    const customerName = user.displayName || 
-      (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : 
-       user.firstName || user.lastName || user.email || 'Customer');
-
-    if (!customerId) {
-      toast({
-        title: 'Error',
-        description: 'User information is missing. Please login again.',
-        variant: 'destructive',
-      });
-      return;
+    // If guest, validate guest form
+    if (!user) {
+      const ok = validateGuest();
+      if (!ok) {
+        toast({
+          title: 'Incomplete details',
+          description: 'Please provide your name and a valid email to continue.',
+          variant: 'destructive',
+        });
+        return;
+      }
     }
+
+    // Prepare booking data
+    const customerId = user ? (user.id || user.uid || null) : null;
+    const customerName = user
+      ? user.displayName || (user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.firstName || user.lastName || user.email || 'Customer')
+      : guestName.trim();
+    const customerEmail = user ? user.email : guestEmail.trim();
 
     const bookingData = {
       adminNote: '',
@@ -134,6 +174,7 @@ const Booking = () => {
       categoryName: service.category?.name || service.category || 'General',
       customerId: customerId,
       customerName: customerName,
+      customerEmail: customerEmail,
       date: selectedDate,
       notes: '',
       rescheduledCount: 0,
@@ -167,9 +208,12 @@ const Booking = () => {
           description: `Your booking for ${service.name} on ${formattedDate} at ${formattedTime} has been confirmed.`,
         });
         
-        // Reset selections
+        // Reset selections + guest info
         setSelectedDate(null);
         setSelectedTime(null);
+        setGuestName('');
+        setGuestEmail('');
+        setGuestErrors({ name: '', email: '' });
         
         // Redirect after a short delay to show the toast
         setTimeout(() => {
@@ -274,6 +318,44 @@ const Booking = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
               >
+                {/* Guest info form for unauthenticated users */}
+                {!user && (
+                  <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">Your details</h4>
+                      <p className="text-sm text-muted-foreground">Provide your name and email to confirm the booking</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="guestName">Full name</Label>
+                        <Input
+                          id="guestName"
+                          type="text"
+                          placeholder="Jane Doe"
+                          value={guestName}
+                          onChange={(e) => setGuestName(e.target.value)}
+                          className={guestErrors.name ? 'border-destructive' : ''}
+                        />
+                        {guestErrors.name && <p className="text-sm text-destructive">{guestErrors.name}</p>}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="guestEmail">Email</Label>
+                        <Input
+                          id="guestEmail"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={guestEmail}
+                          onChange={(e) => setGuestEmail(e.target.value)}
+                          className={guestErrors.email ? 'border-destructive' : ''}
+                        />
+                        {guestErrors.email && <p className="text-sm text-destructive">{guestErrors.email}</p>}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <BookingConfirmation
                   service={service}
                   selectedDate={selectedDate}
@@ -285,7 +367,7 @@ const Booking = () => {
                 <div className="mt-6">
                   <Button
                     onClick={handleConfirmBooking}
-                    disabled={isCreating}
+                    disabled={isCreating || !isGuestFormValid}
                     className="w-full lg:w-auto px-8 py-6 text-lg"
                     size="lg"
                   >

@@ -11,17 +11,7 @@ const HomeServiceCard = ({ service, index, origin = 'home' }) => {
   const { toast } = useToast();
 
   const handleBookNow = () => {
-    // Check if user is logged in
-    if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Need to login to book any service",
-        variant: "default",
-      });
-      return;
-    }
-
-    // Navigate to booking page with service ID
+    // Navigate to booking page with service ID (allow guests)
     navigate('/booking', { state: { serviceId: service.id, from: origin } });
   };
   return (

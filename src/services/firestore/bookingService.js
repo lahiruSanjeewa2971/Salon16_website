@@ -1,7 +1,8 @@
-import { collection, query, where, getDocs, orderBy, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, orderBy, serverTimestamp, doc, updateDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 
 const BOOKINGS_COLLECTION = 'bookings';
+const BOOKING_SUMMARIES_COLLECTION = 'bookingSummaries';
 
 // Helper function to convert time string to minutes
 const timeToMinutes = (timeString) => {
@@ -70,61 +71,65 @@ export const bookingService = {
     // Get active bookings for a specific date (exclude cancelled/rejected)
     getActiveBookingsByDate: async (dateString) => {
         try {
-            const bookingsRef = collection(db, BOOKINGS_COLLECTION);
-            // Try composite query first
+            // Prefer reading from bookingSummaries (lighter, contains time + duration + status)
+            const summariesRef = collection(db, BOOKING_SUMMARIES_COLLECTION);
             try {
-                const q = query(
-                    bookingsRef,
-                    where('date', '==', dateString),
-                    where('status', 'in', ['pending', 'accepted']),
-                    // orderBy('time', 'asc')
-                );
+                const q = query(summariesRef, where('date', '==', dateString));
                 const snapshot = await getDocs(q);
-                
-                return snapshot.docs.map((doc) => {
+                const summaries = snapshot.docs.map((doc) => {
                     const data = doc.data();
                     return {
                         id: doc.id,
                         ...convertTimestamps(data),
                     };
                 });
-            } catch (indexError) {
-                // If composite index doesn't exist, fallback to simpler query
-                if (indexError.code === 'failed-precondition') {
-                    console.warn('Composite index not ready. Using fallback query...');
-                    console.warn('Please create a composite index in Firebase Console:');
-                    console.warn('Collection: bookings');
-                    console.warn('Fields: date (Ascending), status (Ascending), time (Ascending)');
-                    const indexLink = indexError.message.match(/https:\/\/[^\s]+/)?.[0];
-                    if (indexLink) {
-                        console.warn('Direct link to create index:', indexLink);
-                    }
-                    
-                    // Fallback: Get all bookings for date and filter in memory
-                    const allBookings = await bookingService.getBookingsByDate(dateString);
-                    const activeBookings = allBookings.filter(booking => 
-                        booking.status === 'pending' || booking.status === 'accepted'
-                    );
-                    // Sort by time
-                    activeBookings.sort((a, b) => {
-                        const timeA = timeToMinutes(a.time);
-                        const timeB = timeToMinutes(b.time);
-                        return timeA - timeB;
-                    });
-                    return activeBookings;
-                }
-                throw indexError;
+
+                // Consider only active statuses (if status missing treat as active)
+                const activeSummaries = summaries.filter(s => !s.status || s.status === 'pending' || s.status === 'accepted');
+                console.log(`Fetched ${activeSummaries.length} active booking summaries for date ${dateString}`);
+                console.log('Active summaries:', activeSummaries);
+
+                // Sort by time
+                activeSummaries.sort((a, b) => {
+                    const timeA = timeToMinutes(a.time || '00:00');
+                    const timeB = timeToMinutes(b.time || '00:00');
+                    return timeA - timeB;
+                });
+
+                // If we found any summaries, return them
+                if (activeSummaries.length > 0) return activeSummaries;
+            } catch (summaryError) {
+                console.warn('Failed to read from bookingSummaries, falling back to bookings collection:', summaryError);
             }
+
+            // Fallback to original bookings collection query (preserves previous behaviour)
+            const bookingsRef = collection(db, BOOKINGS_COLLECTION);
+            const q = query(
+                bookingsRef,
+                where('date', '==', dateString),
+                // we avoid 'in' here to reduce index requirements and filter in memory
+            );
+            const snapshot = await getDocs(q);
+            const allBookings = snapshot.docs.map((doc) => ({ id: doc.id, ...convertTimestamps(doc.data()) }));
+            const activeBookings = allBookings.filter(booking => booking.status === 'pending' || booking.status === 'accepted');
+            activeBookings.sort((a, b) => {
+                const timeA = timeToMinutes(a.time || '00:00');
+                const timeB = timeToMinutes(b.time || '00:00');
+                return timeA - timeB;
+            });
+            return activeBookings;
         } catch (error) {
             console.error('Error fetching active bookings by date:', error);
             throw error;
         }
     },
 
-    // Create a new booking
+    // Create a new booking (also create a compact summary document)
     createBooking: async (bookingData) => {
         try {
             const bookingsRef = collection(db, BOOKINGS_COLLECTION);
+            const summariesRef = collection(db, BOOKING_SUMMARIES_COLLECTION);
+
             const bookingDoc = {
                 ...bookingData,
                 status: 'pending', // Default status
@@ -132,13 +137,43 @@ export const bookingService = {
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp(),
             };
-            const docRef = await addDoc(bookingsRef, bookingDoc);
+
+            // Summary document — only the fields you requested
+            const summaryDoc = {
+                bookingId: null, // will set below using newBookingRef.id
+                status: bookingDoc.status,
+                customerName: bookingData.customerName || null,
+                customerEmail: bookingData.customerEmail || null,
+                date: bookingData.date || null,
+                categoryId: bookingData.categoryId || null,
+                categoryName: bookingData.categoryName || bookingData.categoryName || null,
+                serviceDuration: bookingData.serviceDuration || null,
+                serviceId: bookingData.serviceId || null,
+                serviceName: bookingData.serviceName || null,
+                time: bookingData.time || null,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+            };
+
+            // Use a batch so both documents are written atomically
+            const batch = writeBatch(db);
+            const newBookingRef = doc(bookingsRef); // auto-id
+            const newSummaryRef = doc(summariesRef); // auto-id
+
+            // set bookingId on summary so we can keep them in sync later
+            summaryDoc.bookingId = newBookingRef.id;
+
+            batch.set(newBookingRef, bookingDoc);
+            batch.set(newSummaryRef, summaryDoc);
+
+            await batch.commit();
+
             return {
-                id: docRef.id,
+                id: newBookingRef.id,
                 ...bookingDoc,
             };
         } catch (error) {
-            console.error('Error creating booking:', error);
+            console.error('Error creating booking (with summary):', error);
             throw error;
         }
     },
@@ -196,6 +231,20 @@ export const bookingService = {
                 status: 'cancelled',
                 updatedAt: serverTimestamp(),
             });
+
+            // Also update corresponding bookingSummary(s) if any
+            try {
+                const summariesRef = collection(db, BOOKING_SUMMARIES_COLLECTION);
+                const q = query(summariesRef, where('bookingId', '==', bookingId));
+                const snapshot = await getDocs(q);
+                for (const sDoc of snapshot.docs) {
+                    const sRef = doc(db, BOOKING_SUMMARIES_COLLECTION, sDoc.id);
+                    await updateDoc(sRef, { status: 'cancelled', updatedAt: serverTimestamp() });
+                }
+            } catch (syncErr) {
+                console.warn('Failed to update booking summary on cancel:', syncErr);
+            }
+
             return bookingId;
         } catch (error) {
             console.error('Error cancelling booking:', error);
@@ -208,6 +257,20 @@ export const bookingService = {
         try {
             const bookingRef = doc(db, BOOKINGS_COLLECTION, bookingId);
             await deleteDoc(bookingRef);
+
+            // Also delete corresponding bookingSummary(s)
+            try {
+                const summariesRef = collection(db, BOOKING_SUMMARIES_COLLECTION);
+                const q = query(summariesRef, where('bookingId', '==', bookingId));
+                const snapshot = await getDocs(q);
+                for (const sDoc of snapshot.docs) {
+                    const sRef = doc(db, BOOKING_SUMMARIES_COLLECTION, sDoc.id);
+                    await deleteDoc(sRef);
+                }
+            } catch (syncErr) {
+                console.warn('Failed to delete booking summary on delete:', syncErr);
+            }
+
             return bookingId;
         } catch (error) {
             console.error('Error deleting booking:', error);
